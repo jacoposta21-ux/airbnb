@@ -215,14 +215,6 @@ export interface Database {
         Args: { p_guide_id: string };
         Returns: Json;
       };
-      is_guide_owner: {
-        Args: { p_guide_id: string };
-        Returns: boolean;
-      };
-      is_guide_public: {
-        Args: { p_guide_id: string };
-        Returns: boolean;
-      };
     };
     Enums: {
       stato_guida: StatoGuida;

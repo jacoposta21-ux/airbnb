@@ -43,6 +43,20 @@ export type RisultatoGuida =
  *  3. altrimenti, per lo slug demo, la guida d'esempio integrata nel codice.
  */
 export async function risolviGuida(slug: string): Promise<RisultatoGuida | null> {
+  try {
+    const trovata = await cercaNelDatabase(slug);
+    if (trovata) return trovata;
+  } catch (e) {
+    // Database irraggiungibile: la demo resta comunque visibile (es. dalla landing).
+    if (slug !== DEMO_SLUG) throw e;
+    console.error("Database non raggiungibile, mostro la demo integrata", e);
+  }
+
+  if (slug === DEMO_SLUG) return { tipo: "demo", guida: DEMO_GUIDE };
+  return null;
+}
+
+async function cercaNelDatabase(slug: string): Promise<RisultatoGuida | null> {
   if (isSupabaseConfigured()) {
     const pubblica = await guidaPubblicaInCache(slug);
     if (pubblica) return { tipo: "pubblica", guida: pubblica };
@@ -54,7 +68,5 @@ export async function risolviGuida(slug: string): Promise<RisultatoGuida | null>
       if (propria && propria.host_id === data.claims.sub) return { tipo: "anteprima", guida: propria };
     }
   }
-
-  if (slug === DEMO_SLUG) return { tipo: "demo", guida: DEMO_GUIDE };
   return null;
 }

@@ -137,8 +137,8 @@ npx supabase link --project-ref <id-progetto>
 npx supabase db push
 ```
 
-Applica **tutte** le migrazioni in ordine (`20261026…_schema_iniziale.sql`, poi
-`20261027…_limiti_ai.sql`). Creano tabelle, policy RLS, trigger, il bucket di storage
+Applica **tutte** le migrazioni in ordine (`20261026…_schema_iniziale.sql`,
+`20261027…_limiti_ai.sql`, `20261028…_funzioni_private.sql`). Creano tabelle, policy RLS, trigger, il bucket di storage
 `guide-media` e il registro delle richieste AI.
 
 ### 2. Autenticazione
