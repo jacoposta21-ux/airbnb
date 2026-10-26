@@ -16,6 +16,10 @@ const nextConfig: NextConfig = {
       },
     },
   },
+  // Le guide degli ospiti non devono mai finire sui motori di ricerca.
+  async headers() {
+    return [{ source: "/g/:path*", headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" }] }];
+  },
   images: {
     remotePatterns: [
       ...(supabaseHost

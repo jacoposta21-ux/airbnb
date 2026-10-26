@@ -20,6 +20,8 @@ import { getIn, opListaMultilingua, scriviCampo, type OpLista, type Path } from 
 import { PlacesEditor } from "./places-editor";
 import { SectionForm } from "./section-forms";
 import { SettingsPanel } from "./settings-panel";
+import { TranslatePanel } from "./translate-panel";
+import type { EsitoTraduzione } from "@/lib/ai-actions";
 
 type StatoSalvataggio = "salvato" | "modifiche" | "salvataggio" | "errore";
 
@@ -60,10 +62,12 @@ export function GuideEditor({
   guidaIniziale,
   hostId,
   avviso,
+  aiDisponibile,
 }: {
   guidaIniziale: GuidaCompleta;
   hostId: string;
   avviso?: string;
+  aiDisponibile: boolean;
 }) {
   const [guida, setGuida] = useState(guidaIniziale);
   const [linguaScelta, setLingua] = useState<Lingua>("it");
@@ -79,6 +83,7 @@ export function GuideEditor({
   // --- Salvataggio automatico ------------------------------------------------
   const guidaRef = useRef(guida);
   const versione = useRef(0);
+  const versioneSalvata = useRef(0);
   const inCorso = useRef(false);
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const primoRender = useRef(true);
@@ -100,6 +105,7 @@ export function GuideEditor({
       return;
     }
     setErrore(null);
+    versioneSalvata.current = v;
     if (v !== versione.current) {
       // Ci sono modifiche arrivate durante il salvataggio: salva ancora.
       setStato("modifiche");
@@ -112,6 +118,29 @@ export function GuideEditor({
   useEffect(() => {
     salvaRef.current = salva;
   }, [salva]);
+
+  /** Salva subito (senza attendere il ritardo) e dice se tutto è stato salvato. */
+  const salvaOra = useCallback(async () => {
+    clearTimeout(timer.current);
+    while (inCorso.current) await new Promise((r) => setTimeout(r, 200));
+    if (versioneSalvata.current !== versione.current) await salva();
+    return versioneSalvata.current === versione.current;
+  }, [salva]);
+
+  /** Applica allo stato le traduzioni appena salvate dal server. */
+  const applicaTraduzione = (esito: EsitoTraduzione) =>
+    setGuida((g) => ({
+      ...g,
+      lingue_attive: esito.lingue_attive ?? g.lingue_attive,
+      sezioni: g.sezioni.map((s) => {
+        const t = esito.sezioni?.find((x) => x.id === s.id);
+        return t ? { ...s, contenuto: t.contenuto as Sezione["contenuto"] } : s;
+      }),
+      luoghi: g.luoghi.map((l) => {
+        const t = esito.luoghi?.find((x) => x.id === l.id);
+        return t ? { ...l, descrizione: t.descrizione } : l;
+      }),
+    }));
 
   useEffect(() => {
     guidaRef.current = guida;
@@ -241,6 +270,14 @@ export function GuideEditor({
             <SettingsPanel guida={guida} onChange={aggiornaGuida} carica={caricaFoto} />
           ) : (
             <>
+              <TranslatePanel
+                guideId={guida.id}
+                lingueAttive={guida.lingue_attive}
+                aiDisponibile={aiDisponibile}
+                salvaOra={salvaOra}
+                onTradotta={applicaTraduzione}
+              />
+
               {/* Lingua in modifica */}
               {guida.lingue_attive.length > 1 && (
                 <div className="space-y-2">

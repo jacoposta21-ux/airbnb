@@ -11,12 +11,12 @@ export async function generateMetadata({ params }: PageProps<"/g/[slug]">): Prom
   const risultato = await risolviGuida(slug);
   if (!risultato) return { title: "Guida non trovata", robots: { index: false } };
 
-  const { guida, tipo } = risultato;
+  const { guida } = risultato;
   return {
     title: { absolute: `${guida.nome_struttura}${guida.citta ? ` · ${guida.citta}` : ""}` },
     description: `${DIZIONARI.it.sezioni.benvenuto}! Guida per gli ospiti di ${guida.nome_struttura}.`,
-    // Le guide non pagate (anteprime) non vanno mai indicizzate.
-    robots: tipo === "pubblica" ? { index: true, follow: false } : { index: false, follow: false },
+    // Nessuna guida va indicizzata: contengono password Wi-Fi e istruzioni per entrare in casa.
+    robots: { index: false, follow: false, nocache: true, googleBot: { index: false, follow: false } },
     openGraph: guida.cover_url ? { images: [guida.cover_url] } : undefined,
   };
 }

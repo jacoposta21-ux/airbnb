@@ -113,7 +113,7 @@ const FAQ = [
   },
   {
     d: "Cosa vedono gli ospiti prima che io paghi?",
-    r: "Niente: finché non pubblichi, la guida è visibile solo a te, con la scritta “anteprima”, e non viene indicizzata dai motori di ricerca.",
+    r: "Niente: finché non pubblichi, la guida è visibile solo a te, con la scritta “anteprima”. E anche dopo la pubblicazione nessuna guida finisce su Google: la vede solo chi ha il link o il QR code.",
   },
 ];
 

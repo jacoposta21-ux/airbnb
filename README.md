@@ -20,7 +20,7 @@ tramite link e QR code.
 | ---- | --------- | ----- |
 | 1 | Struttura del progetto, database, autenticazione, dashboard | ✅ |
 | 2 | Editor a sezioni, wizard, duplicazione, pagina pubblica `/g/[slug]`, landing completa | ✅ |
-| 3 | Generazione AI e traduzioni | ⏳ |
+| 3 | Generazione AI e traduzioni | ✅ |
 | 4 | Pagamenti Stripe, QR code, cartello A5, statistiche | ⏳ |
 
 ## Struttura
@@ -61,6 +61,27 @@ src/
 supabase/migrations/                  schema SQL, RLS, storage
 scripts/seed.ts                       crea la guida demo
 ```
+
+## Intelligenza artificiale (Claude)
+
+- **Generazione** (`/guide/nuova/ai`): l'host incolla il testo dell'annuncio e qualche dato
+  chiave; Claude restituisce, con output strutturato (schema Zod), il contenuto di tutte
+  le sezioni e qualche luogo consigliato. Il prompt vieta di inventare password, codici,
+  numeri e locali: i dati mancanti restano vuoti da completare.
+- **Traduzione** (pulsante *Traduci con AI* nell'editor): una richiesta per lingua, in
+  parallelo. Modalità *solo testi mancanti* (conserva le correzioni manuali) oppure
+  *ritraduci tutto*. Password, indirizzi, colori, numeri e CIN non vengono mai toccati.
+- Modello: `claude-opus-5-5` (in `src/lib/ai.ts`), con *fallback* lato server in caso di
+  rifiuto dei filtri di sicurezza. Effort `medium` per la generazione, `low` per la traduzione.
+- **Limiti di costo**: ogni host può fare al massimo 10 generazioni e 30 traduzioni ogni
+  24 ore (tabella `ai_richieste`, valori in `src/lib/ai-actions.ts`).
+- Su Vercel le pagine che chiamano l'AI dichiarano `maxDuration = 300` secondi: serve un
+  piano che lo consenta (sul piano Hobby il limite può essere più basso).
+
+## Indicizzazione
+
+Le guide **non vengono mai indicizzate** dai motori di ricerca (meta `noindex` e header
+`X-Robots-Tag`), perché contengono password Wi-Fi e istruzioni per entrare in casa.
 
 ## Come funzionano le traduzioni
 
@@ -112,7 +133,9 @@ npx supabase link --project-ref <id-progetto>
 npx supabase db push
 ```
 
-La migrazione crea tabelle, policy RLS, trigger e il bucket di storage `guide-media`.
+Applica **tutte** le migrazioni in ordine (`20261026…_schema_iniziale.sql`, poi
+`20261027…_limiti_ai.sql`). Creano tabelle, policy RLS, trigger, il bucket di storage
+`guide-media` e il registro delle richieste AI.
 
 ### 2. Autenticazione
 

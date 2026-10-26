@@ -5,6 +5,7 @@ import { Alert } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { SubmitButton } from "@/components/ui/submit-button";
+import { aiConfigurata } from "@/lib/ai";
 import { requireHost } from "@/lib/auth";
 import { duplicaGuida } from "@/lib/guide-actions";
 import { listMyGuides } from "@/lib/guides";
@@ -15,7 +16,7 @@ export default async function NuovaGuidaPage({ searchParams }: PageProps<"/guide
   const { errore } = await searchParams;
   const { supabase, host } = await requireHost();
   const guide = await listMyGuides(supabase, host.id);
-  const aiDisponibile = Boolean(process.env.ANTHROPIC_API_KEY);
+  const aiDisponibile = aiConfigurata();
 
   return (
     <div className="mx-auto w-full max-w-4xl px-4 py-8 sm:px-6 sm:py-12">

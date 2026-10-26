@@ -193,6 +193,21 @@ export interface Database {
           },
         ];
       };
+      ai_richieste: {
+        Row: {
+          id: number;
+          host_id: string;
+          tipo: "generazione" | "traduzione";
+          creato_il: string;
+        };
+        Insert: {
+          host_id: string;
+          tipo: "generazione" | "traduzione";
+          creato_il?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["ai_richieste"]["Insert"]>;
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: {
