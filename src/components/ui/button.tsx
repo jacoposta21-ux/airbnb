@@ -7,7 +7,7 @@ type Variant = "primary" | "secondary" | "ghost" | "danger";
 type Size = "sm" | "md" | "lg";
 
 const base =
-  "inline-flex items-center justify-center gap-2 rounded-full font-medium transition-colors disabled:pointer-events-none disabled:opacity-60 select-none";
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full font-medium transition-colors disabled:pointer-events-none disabled:opacity-60 select-none";
 
 const variants: Record<Variant, string> = {
   primary: "bg-terracotta text-white hover:bg-terracotta-scuro shadow-sm",

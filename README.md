@@ -19,7 +19,7 @@ tramite link e QR code.
 | Fase | Contenuto | Stato |
 | ---- | --------- | ----- |
 | 1 | Struttura del progetto, database, autenticazione, dashboard | ✅ |
-| 2 | Editor a sezioni, wizard, pagina pubblica `/g/[slug]`, landing completa | ⏳ |
+| 2 | Editor a sezioni, wizard, duplicazione, pagina pubblica `/g/[slug]`, landing completa | ✅ |
 | 3 | Generazione AI e traduzioni | ⏳ |
 | 4 | Pagamenti Stripe, QR code, cartello A5, statistiche | ⏳ |
 
@@ -30,16 +30,29 @@ src/
   app/
     (auth)/login, (auth)/registrati   accesso e registrazione (server action)
     (app)/dashboard                   elenco guide dell'host (area protetta)
+    (app)/guide/nuova                 scelta: procedura guidata, AI, duplica
+    (app)/guide/nuova/wizard          procedura guidata, una sezione alla volta
+    (app)/guide/[id]/modifica         editor a sezioni con anteprima live su telefono
+    g/[slug]                          guida pubblica per l'ospite (nessun login)
+    api/visite                        registrazione anonima delle visite
     auth/callback                     ritorno da Google OAuth / conferma email
     auth/esci                         logout
     page.tsx                          landing page
-  components/                         componenti riutilizzabili (ui/, auth/, dashboard/)
+  components/
+    guide/                            vista della guida (pubblica, anteprima, landing)
+    editor/                           editor: form per sezione, consigli locali, impostazioni
+    wizard/                           procedura guidata
+    ui/                               pulsanti, campi, card, avvisi…
   data/demo-guide.ts                  guida dimostrativa di Firenze (seed + landing)
   lib/
     supabase/                         client browser, server, admin e refresh sessione
     auth.ts                           requireHost(), redirect sicuri
     guides.ts                         accesso ai dati delle guide
     sections.ts                       catalogo sezioni e contenuti predefiniti italiani
+    i18n.ts                           testi dell'interfaccia in 5 lingue, scelta lingua, fusione traduzioni
+    guide-actions.ts                  Server Action: crea, salva, duplica, elimina guida
+    public-guide.ts                   lettura in cache della guida pubblica
+    upload.ts                         compressione (WebP, max 1600 px) e upload immagini
     config.ts                         nome app, prezzo, URL del sito
   types/
     guide.ts                          tipi di dominio (contenuto di ogni sezione)
@@ -48,6 +61,22 @@ src/
 supabase/migrations/                  schema SQL, RLS, storage
 scripts/seed.ts                       crea la guida demo
 ```
+
+## Come funzionano le traduzioni
+
+Il contenuto italiano definisce la struttura (quanti passi, quanti elettrodomestici…);
+ogni traduzione contiene solo i testi. Quando una traduzione manca, l'ospite vede il
+testo italiano. Alcuni campi sono uguali in tutte le lingue (password Wi-Fi, indirizzo,
+colori dei contenitori, numeri di telefono, codice CIN): vedi `CAMPI_CONDIVISI` in
+`src/lib/i18n.ts`.
+
+## Prestazioni della guida pubblica
+
+- Dati letti in cache (`unstable_cache`) e invalidati a ogni salvataggio dell'editor.
+- Nessuna libreria pesante lato ospite; immagini compresse in WebP al caricamento e
+  caricate in modo pigro.
+- Un piccolo service worker (`public/sw-guida.js`) conserva le guide già aperte, che si
+  riaprono anche senza connessione.
 
 ## Modello dati
 
