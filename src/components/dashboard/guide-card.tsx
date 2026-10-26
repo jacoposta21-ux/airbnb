@@ -20,7 +20,13 @@ export function GuideCard({ guida }: { guida: GuidaRiepilogo }) {
           <div className="size-full" style={{ background: `linear-gradient(135deg, ${guida.colore}, ${guida.colore}99)` }} />
         )}
         <div className="absolute left-3 top-3">
-          {pubblicata ? <Badge tone="success">Pubblicata</Badge> : <Badge tone="warning">Bozza</Badge>}
+          {pubblicata ? (
+            <Badge tone="success">Online</Badge>
+          ) : guida.pagata ? (
+            <Badge>Offline</Badge>
+          ) : (
+            <Badge tone="warning">Bozza</Badge>
+          )}
         </div>
       </Link>
 
@@ -47,7 +53,7 @@ export function GuideCard({ guida }: { guida: GuidaRiepilogo }) {
             variant="secondary"
             icon={<QrCode className="size-4" />}
           >
-            {pubblicata ? "QR code" : "Pubblica"}
+            {guida.pagata ? "QR e statistiche" : "Pubblica"}
           </ButtonLink>
           <ButtonLink
             href={`/g/${guida.slug}`}

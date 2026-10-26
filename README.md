@@ -21,7 +21,7 @@ tramite link e QR code.
 | 1 | Struttura del progetto, database, autenticazione, dashboard | ✅ |
 | 2 | Editor a sezioni, wizard, duplicazione, pagina pubblica `/g/[slug]`, landing completa | ✅ |
 | 3 | Generazione AI e traduzioni | ✅ |
-| 4 | Pagamenti Stripe, QR code, cartello A5, statistiche | ⏳ |
+| 4 | Pagamenti Stripe, QR code, cartello A5, statistiche | ✅ |
 
 ## Struttura
 
@@ -33,6 +33,10 @@ src/
     (app)/guide/nuova                 scelta: procedura guidata, AI, duplica
     (app)/guide/nuova/wizard          procedura guidata, una sezione alla volta
     (app)/guide/[id]/modifica         editor a sezioni con anteprima live su telefono
+    (app)/guide/[id]/pubblica         pagamento, link, QR code, cartello A5, statistiche
+    api/stripe/webhook                conferma dei pagamenti Stripe
+    api/guide/[id]/qr                 QR code in PNG
+    api/guide/[id]/cartello           cartello A5 in PDF
     g/[slug]                          guida pubblica per l'ospite (nessun login)
     api/visite                        registrazione anonima delle visite
     auth/callback                     ritorno da Google OAuth / conferma email
@@ -160,7 +164,32 @@ Firenze, su `/g/demo-firenze`.
 > Tariffe, orari ZTL e calendario della raccolta nella guida demo sono indicativi:
 > verificali sempre sul sito del Comune prima di usarli in una guida reale.
 
-### 4. Avvio
+### 4. Pagamenti (Stripe)
+
+1. Crea un account su [stripe.com](https://stripe.com) e copia la *Secret key* (in modalità
+   test inizia con `sk_test_`) in `STRIPE_SECRET_KEY`.
+2. **Webhook**: Stripe → Developers → Webhooks → *Add endpoint*
+   - URL: `https://<tuo-dominio>/api/stripe/webhook`
+   - Eventi: `checkout.session.completed`, `checkout.session.async_payment_succeeded`,
+     `checkout.session.async_payment_failed`, `checkout.session.expired`
+   - Copia il *Signing secret* (`whsec_…`) in `STRIPE_WEBHOOK_SECRET`.
+3. In locale usa la Stripe CLI per inoltrare gli eventi:
+   ```bash
+   stripe listen --forward-to localhost:3000/api/stripe/webhook
+   ```
+   (stampa un `whsec_…` temporaneo da mettere in `.env.local`). Carta di test: `4242 4242 4242 4242`.
+
+Come funziona: l'host paga su Stripe Checkout (`/guide/[id]/pubblica`); il webhook, con la
+chiave service role, segna la guida come `pagata` e `pubblicata`. Anche la pagina di
+ritorno verifica la sessione con Stripe, quindi la guida si sblocca subito anche se il
+webhook arriva in ritardo. Il trigger SQL impedisce a chiunque altro di segnare una guida
+come pagata.
+
+> Fatturazione: Checkout non emette fatture. Se ti servono (in Italia di norma sì),
+> attiva `invoice_creation` in `src/lib/payment-actions.ts`, Stripe Tax o collega il tuo
+> sistema di fatturazione elettronica.
+
+### 5. Avvio
 
 ```bash
 npm run dev        # http://localhost:3000
