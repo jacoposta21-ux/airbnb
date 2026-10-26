@@ -1,0 +1,51 @@
+@import "tailwindcss";
+
+/*
+ * Palette ispirata all'ospitalità italiana: terracotta, crema, oliva,
+ * inchiostro caldo. Usata come utility Tailwind: bg-crema, text-terracotta…
+ */
+@theme {
+  --color-crema: #fbf7f1;
+  --color-sabbia: #efe5d6;
+  --color-bordo: #e4d7c4;
+  --color-inchiostro: #2a211c;
+  --color-grigio: #6f6157;
+  --color-terracotta: #c4572e;
+  --color-terracotta-scuro: #a2431f;
+  --color-oliva: #5f6f34;
+  --color-oliva-chiaro: #e7ebd9;
+  --color-oro: #d9a441;
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-serif: var(--font-fraunces), ui-serif, Georgia, "Times New Roman", serif;
+
+  --radius-xl: 1rem;
+  --radius-2xl: 1.25rem;
+  --shadow-morbida: 0 1px 2px rgb(42 33 28 / 0.04), 0 8px 24px -8px rgb(42 33 28 / 0.12);
+}
+
+html {
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background: var(--color-crema);
+  color: var(--color-inchiostro);
+  font-family: var(--font-sans);
+}
+
+/* Focus ben visibile per la navigazione da tastiera */
+:focus-visible {
+  outline: 2px solid var(--color-terracotta);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
