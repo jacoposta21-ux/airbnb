@@ -171,7 +171,8 @@ Firenze, su `/g/demo-firenze`.
 2. **Webhook**: Stripe → Developers → Webhooks → *Add endpoint*
    - URL: `https://<tuo-dominio>/api/stripe/webhook`
    - Eventi: `checkout.session.completed`, `checkout.session.async_payment_succeeded`,
-     `checkout.session.async_payment_failed`, `checkout.session.expired`
+     `checkout.session.async_payment_failed`, `checkout.session.expired`, `charge.refunded`
+     (quest'ultimo rimette in bozza la guida dopo un rimborso totale)
    - Copia il *Signing secret* (`whsec_…`) in `STRIPE_WEBHOOK_SECRET`.
 3. In locale usa la Stripe CLI per inoltrare gli eventi:
    ```bash
@@ -189,7 +190,21 @@ come pagata.
 > attiva `invoice_creation` in `src/lib/payment-actions.ts`, Stripe Tax o collega il tuo
 > sistema di fatturazione elettronica.
 
-### 5. Avvio
+### 5. Pagine legali
+
+Termini (`/termini`), privacy e cookie (`/privacy`), rimborsi (`/rimborsi`) e contatti
+(`/contatti`) leggono i dati del titolare da queste variabili:
+
+| Variabile | Esempio |
+| --------- | ------- |
+| `NEXT_PUBLIC_TITOLARE_NOME` | Mario Rossi |
+| `NEXT_PUBLIC_TITOLARE_SEDE` | Firenze (facoltativa) |
+| `NEXT_PUBLIC_TITOLARE_PIVA` | facoltativa: compare solo se impostata |
+| `NEXT_PUBLIC_EMAIL_CONTATTO` | assistenza@tuodominio.it |
+
+I testi sono una base: falli rileggere da un professionista prima di vendere.
+
+### 6. Avvio
 
 ```bash
 npm run dev        # http://localhost:3000

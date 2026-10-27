@@ -43,3 +43,32 @@ export async function registraPagamentoFallito(session: Stripe.Checkout.Session)
     .eq("stripe_session_id", session.id)
     .eq("stato", "in_attesa");
 }
+
+/**
+ * Rimborso totale fatto dalla dashboard Stripe: la guida torna in bozza (non
+ * più pubblica) e il pagamento risulta rimborsato. Chiamata dal webhook
+ * `charge.refunded`. I rimborsi parziali non cambiano lo stato della guida.
+ */
+export async function registraRimborso(charge: Stripe.Charge, sessionId: string) {
+  if (!charge.refunded) return false;
+  const admin = createAdminClient();
+  const { data: pagamento } = await admin
+    .from("payments")
+    .update({ stato: "rimborsato" })
+    .eq("stripe_session_id", sessionId)
+    .select("guide_id")
+    .maybeSingle();
+  if (!pagamento) return false;
+
+  const { data: guida, error } = await admin
+    .from("guides")
+    .update({ pagata: false, stato: "bozza" })
+    .eq("id", pagamento.guide_id)
+    .select("slug")
+    .single();
+  if (error) throw new Error(`Guida non aggiornata dopo il rimborso: ${error.message}`);
+
+  revalidateTag(tagGuida(guida.slug), { expire: 0 });
+  revalidatePath("/dashboard");
+  return true;
+}

@@ -17,6 +17,7 @@ import {
 import Link from "next/link";
 import { GuideView } from "@/components/guide/guide-view";
 import { Logo } from "@/components/logo";
+import { SiteFooter } from "@/components/site-footer";
 import { PhoneMockup } from "@/components/phone-mockup";
 import { ButtonLink } from "@/components/ui/button";
 import { DEMO_GUIDE } from "@/data/demo-guide";
@@ -311,14 +312,7 @@ export default function Home() {
         </section>
       </main>
 
-      <footer className="border-t border-bordo/60">
-        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 px-4 py-8 text-sm text-grigio sm:flex-row sm:px-6">
-          <Logo />
-          <p>
-            © {new Date().getFullYear()} {APP_NAME} · Fatto in Italia, per l&apos;ospitalità italiana
-          </p>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }

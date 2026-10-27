@@ -377,6 +377,9 @@ export function GuideView({
           <span>
             {t.creatoCon} <span className="font-semibold">{APP_NAME}</span>
           </span>
+          <a href="/privacy" className="underline underline-offset-2 hover:text-inchiostro">
+            Privacy
+          </a>
         </footer>
       </main>
     </div>

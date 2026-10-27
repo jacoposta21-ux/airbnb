@@ -1,12 +1,12 @@
 import { NextResponse, type NextRequest } from "next/server";
 import type Stripe from "stripe";
-import { registraPagamento, registraPagamentoFallito } from "@/lib/payments";
+import { registraPagamento, registraPagamentoFallito, registraRimborso } from "@/lib/payments";
 import { stripe } from "@/lib/stripe";
 
 /**
  * Webhook Stripe. Eventi da abilitare nella dashboard Stripe:
  * checkout.session.completed, checkout.session.async_payment_succeeded,
- * checkout.session.async_payment_failed, checkout.session.expired
+ * checkout.session.async_payment_failed, checkout.session.expired, charge.refunded
  */
 export async function POST(request: NextRequest) {
   const secret = process.env.STRIPE_WEBHOOK_SECRET;
@@ -32,6 +32,14 @@ export async function POST(request: NextRequest) {
       case "checkout.session.expired":
         await registraPagamentoFallito(event.data.object);
         break;
+      case "charge.refunded": {
+        const charge = event.data.object;
+        const paymentIntent = typeof charge.payment_intent === "string" ? charge.payment_intent : charge.payment_intent?.id;
+        if (!paymentIntent) break;
+        const sessioni = await stripe().checkout.sessions.list({ payment_intent: paymentIntent, limit: 1 });
+        if (sessioni.data[0]) await registraRimborso(charge, sessioni.data[0].id);
+        break;
+      }
     }
   } catch (e) {
     console.error("Errore nella gestione del webhook", e);

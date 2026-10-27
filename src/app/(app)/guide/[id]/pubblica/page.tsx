@@ -155,6 +155,17 @@ export default async function PubblicaPage({ params, searchParams }: PageProps<"
             <p className="mt-3 flex items-center justify-center gap-1.5 text-xs text-grigio">
               <Lock className="size-3" aria-hidden="true" /> Pagamento sicuro con Stripe: carta, Apple Pay, Google Pay
             </p>
+            <p className="mt-2 text-xs text-grigio">
+              Procedendo accetti i{" "}
+              <Link href="/termini" className="underline underline-offset-2">
+                Termini di servizio
+              </Link>
+              . Rimborso integrale entro 14 giorni:{" "}
+              <Link href="/rimborsi" className="underline underline-offset-2">
+                come funziona
+              </Link>
+              .
+            </p>
           </Card>
         </div>
       ) : (

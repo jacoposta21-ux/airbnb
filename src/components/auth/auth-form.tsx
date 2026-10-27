@@ -76,6 +76,19 @@ export function AuthForm({ mode, next, initialError }: AuthFormProps) {
           <Button type="submit" className="w-full" loading={pending}>
             {isLogin ? "Accedi" : "Crea account"}
           </Button>
+          {!isLogin && (
+            <p className="text-center text-xs text-grigio">
+              Creando l&apos;account accetti i{" "}
+              <Link href="/termini" className="underline underline-offset-2">
+                Termini di servizio
+              </Link>{" "}
+              e confermi di aver letto l&apos;
+              <Link href="/privacy" className="underline underline-offset-2">
+                Informativa privacy
+              </Link>
+              .
+            </p>
+          )}
         </form>
       )}
 
