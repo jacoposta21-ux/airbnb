@@ -4,7 +4,7 @@ import type { Database } from "@/types/database";
 import { isSupabaseConfigured, supabaseEnv } from "./env";
 
 /** Percorsi che richiedono login. */
-const PROTECTED_PREFIXES = ["/dashboard", "/guide"];
+const PROTECTED_PREFIXES = ["/dashboard", "/guide", "/admin"];
 /** Percorsi da cui un utente già loggato viene rimandato alla dashboard. */
 const AUTH_PAGES = ["/login", "/registrati"];
 

@@ -204,7 +204,14 @@ Termini (`/termini`), privacy e cookie (`/privacy`), rimborsi (`/rimborsi`) e co
 
 I testi sono una base: falli rileggere da un professionista prima di vendere.
 
-### 6. Avvio
+### 6. Pannello admin
+
+`/admin` mostra incassi, pagamenti, guide e host di tutta la piattaforma e permette di
+mettere offline una guida. È accessibile solo agli utenti la cui email è in
+`ADMIN_EMAILS` (variabile solo lato server, separata da virgola); per tutti gli altri la
+pagina non esiste (404). I dati sono letti con la chiave service role, dopo il controllo.
+
+### 7. Avvio
 
 ```bash
 npm run dev        # http://localhost:3000
